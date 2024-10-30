@@ -2,9 +2,8 @@
 """
 Making Change Module
 This module contains a function that determines the fewest number of coins
-needed to meet a given total amount.
+needed to meet a given total amount using an optimized approach.
 """
-
 
 def makeChange(coins, total):
     """
@@ -22,21 +21,47 @@ def makeChange(coins, total):
     if total <= 0:
         return 0
 
-    # Sort coins in descending order for optimization
-    coins = sorted(coins, reverse=True)
+    # Sort coins in descending order for a greedy approach
+    coins.sort(reverse=True)
 
-    # Initialize dp array with total + 1 (impossible value)
-    # as we can't use more coins than the total itself
-    dp = [float('inf')] * (total + 1)
-    dp[0] = 0
+    # Memoization dictionary to store computed minimum coins for sub-totals
+    memo = {}
 
-    # Build solution for all amounts from 1 to total
-    for i in range(1, total + 1):
+    def backtrack(remaining):
+        """
+        Recursively determine the minimum number of coins needed
+        for a given remaining amount, using memoization to avoid
+        redundant calculations.
+        
+        Args:
+            remaining (int): Remaining amount to make up with coins
+        
+        Returns:
+            int: Fewest number of coins needed to meet the remaining total,
+                 or -1 if it is not possible.
+        """
+        # If the remaining total is 0, no coins are needed
+        if remaining == 0:
+            return 0
+        # If already computed, return the result from memo
+        if remaining in memo:
+            return memo[remaining]
+        
+        # Set minimum coins to a large number initially
+        min_coins = float('inf')
+        
         # Try each coin
         for coin in coins:
-            if coin <= i:
-                # If using this coin gives better solution, update dp[i]
-                dp[i] = min(dp[i], dp[i - coin] + 1)
+            if coin > remaining:
+                continue  # Skip if coin is larger than the remaining total
+            # Recurse with the reduced total and add one coin
+            result = backtrack(remaining - coin)
+            if result != -1:
+                min_coins = min(min_coins, result + 1)
 
-    # If dp[total] is still infinity, no solution exists
-    return dp[total] if dp[total] != float('inf') else -1
+        # If no solution, set to -1; otherwise, set to min_coins found
+        memo[remaining] = -1 if min_coins == float('inf') else min_coins
+        return memo[remaining]
+
+    # Call the backtracking function
+    return backtrack(total)
