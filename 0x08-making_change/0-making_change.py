@@ -1,18 +1,39 @@
 #!/usr/bin/python3
 """
-Chamge comes from within
+Module for making change using dynamic programming
+Determines the fewest number of coins needed to meet a given total
 """
 
 
 def makeChange(coins, total):
     """
-    Given a pile of cons of different values,
-    determine the fewest number of cons needed to meet a given amount total.
+    Determine the fewest number of coins needed to meet a given total
+
+    Args:
+        coins (list): List of coin values available
+        total (int): Target total to make change for
+
+    Returns:
+        int: Fewest number of coins needed to meet total
+            - Returns 0 if total is 0 or less
+            - Returns -1 if total cannot be met by any combination of coins
     """
     if total <= 0:
         return 0
-    dp = [0] + [float("inf")] * (total)
-    for coin in coins:
-        for i in range(coin, total + 1):
-            dp[i] = min(dp[i], dp[i - coin] + 1)
-    return dp[-1] if dp[-1] != float("inf") else -1
+
+    # Sort coins in descending order for optimization
+    coins.sort(reverse=True)
+
+    # Create dp array initialized with total + 1 (impossible value)
+    dp = [float('inf')] * (total + 1)
+    dp[0] = 0
+
+    # Build solution for all amounts from 1 to total
+    for i in range(1, total + 1):
+        # Try each coin
+        for coin in coins:
+            if coin <= i:
+                # Take minimum of current solution and solution with current coin
+                dp[i] = min(dp[i], dp[i - coin] + 1)
+
+    return dp[total] if dp[total] != float('inf') else -1
