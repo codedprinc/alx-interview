@@ -33,7 +33,8 @@ def makeChange(coins, total):
         # Try each coin
         for coin in coins:
             if coin <= i:
-                # Take minimum of current solution and solution with current coin
+                # Take minimum of current solution and 
+                #solution with current coin
                 dp[i] = min(dp[i], dp[i - coin] + 1)
 
     return dp[total] if dp[total] != float('inf') else -1
